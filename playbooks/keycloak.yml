@@ -1,0 +1,6 @@
+---
+- hosts: keycloak
+  tasks:
+    - name: Keycloak role
+      import_role:
+        name: keycloak
