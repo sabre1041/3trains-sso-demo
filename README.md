@@ -1,7 +1,7 @@
-Train Ansible
+3trains-sso-demo
 ============
 
-Ansible based automation for the Train PoC
+Ansible based SSO automation for 3trains
 
 ## Ansible Roles
 
