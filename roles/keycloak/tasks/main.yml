@@ -159,7 +159,7 @@
   retries: 5
   delay: 2
 
-- name: "Determine if reralm exists"
+- name: "Determine if realm exists"
   uri:
     url: "{{ keycloak_url }}/auth/admin/realms/{{ keycloak_realm }}"
     method: GET
@@ -183,7 +183,7 @@
     status_code: 201
   when: keycloak_realm_exists.status == 404
 
-- name: Create Train Client
+- name: Create 3trains Client
   keycloak_client:
     auth_client_id: "{{ keycloak_auth_client }}"
     auth_keycloak_url: "{{ keycloak_url }}/auth"
@@ -192,7 +192,22 @@
     auth_password: "{{ keycloak_admin_password }}"
     client_id: "{{ item.name }}"
     realm: "{{ item.realm }}"
-    redirect_uris: "{{ redirect_uris | default(omit) }}"
     default_roles: "{{ item.roles | default(omit) }}"
+    root_url: "{{ item.root_url | default('') }}"
+    redirect_uris: "{{ item.redirect_uris | default([]) }}"
     state: present
+  register: create_client_result
   loop: "{{ keycloak_clients }}"
+
+- name: Manage Users
+  include_tasks: manage_user.yml
+  loop: "{{ keycloak_users }}"
+  loop_control:
+    loop_var: user
+
+- name: Manage User Roles
+  include_tasks: manage_user_roles.yml
+  loop: "{{ keycloak_users }}"
+  loop_control:
+    loop_var: user
+  when: "'client_roles' in user"

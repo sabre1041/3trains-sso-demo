@@ -27,16 +27,45 @@ keycloak_java_opts: "-Xms1024m -Xmx20480m -XX:MaxPermSize=768m"
 
 keycloak_force_install: false
 
-keycloak_realm: train
+keycloak_realm: 3trains
+
+keycloak_3trains_client_name: 3trains
+keycloak_3trains_admin_role: 3trainsadmin
+keycloak_3trains_user_role: 3trainsuser
+
+# Demo App
+demo_app_host: "{{ trains_app_host | default('https://localhost:8443') }}"
+demo_app_endpoint: "{{ demo_app_host + '/kitchensink' }}"
 
 keycloak_clients:
-  - name: train-app
+  - name: "{{ keycloak_3trains_client_name }}"
     roles:
-      - user
+      - "{{ keycloak_3trains_user_role }}"
+      - "{{ keycloak_3trains_admin_role }}"
     realm: "{{ keycloak_realm }}"
+    root_url: "{{ demo_app_endpoint }}"
+    redirect_uris:
+      - "{{ demo_app_endpoint + '/*' }}"
 
 keycloak_auth_realm: master
 keycloak_auth_client: admin-cli
 
 keycloak_url: "http://{{ keycloak_host }}:{{ keycloak_http_port }}"
 keycloak_management_url: "http://{{ keycloak_host }}:{{ keycloak_management_http_port }}"
+
+keycloak_users:
+  - username: 3trainsadmin
+    password: password
+    client_roles:
+      - client: "{{ keycloak_3trains_client_name }}"
+        role: "{{ keycloak_3trains_admin_role }}"
+        realm: "{{ keycloak_realm }}"
+      - client: "{{ keycloak_3trains_client_name }}"
+        role: "{{ keycloak_3trains_user_role }}"
+        realm: "{{ keycloak_realm }}"
+  - username: 3trainsuser
+    password: password
+    client_roles:
+      - client: "{{ keycloak_3trains_client_name }}"
+        role: "{{ keycloak_3trains_user_role }}"
+        realm: "{{ keycloak_realm }}"
